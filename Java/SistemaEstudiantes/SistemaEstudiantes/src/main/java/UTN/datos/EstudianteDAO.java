@@ -7,6 +7,7 @@ import UTN.dominio.Estudiante;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,13 +82,39 @@ public class EstudianteDAO {
         } //fin finally
         return  false;
     }
+    public boolean agregarEstudiante(Estudiante estudiante){
+        PreparedStatement ps;
+        Connection con = getConnection();
+        String sql = "INSERT INTO estudiantes.estudiantes (nombre, apellido,telefono, email) VALUES (?,?,?,?)";
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setString(1,estudiante.getNombre());
+            ps.setString(2,estudiante.getApellido());
+            ps.setString(3,estudiante.getTelefono());
+            ps.setString(4,estudiante.getEmail());
+            ps.execute();//execute es solo para insertar
+            return true;
 
+        } catch (SQLException e) {
+            System.out.println("Ocurrió un error al Agregar un  estudiante" + e.getMessage())
+            ;
+        }//fin cath
+        finally {
+            try{
+                con.close();
+            }//fin try
+            catch (Exception e){
+                System.out.println("Error al cerrar la conexion" + e.getMessage());
+            }//fin cath
+        }//fin finally
+        return false;
+    }//fin método agregar estudiante
     public static void main(String[] args) {
         //Listar los estudiantes
         var estudianteDao = new EstudianteDAO();
         System.out.println("Listado de estudiantes");
         List <Estudiante> estudiantes = estudianteDao.listarEstudiantes();
-        estudiantes.forEach(System.out::println);//Funcion lambda para imprimir.
+        estudiantes.forEach(System.out::println);//Funcion lambda para imprimir
 
     }
 }
